@@ -4,7 +4,7 @@ const { googleAuth, logout } = require("../controller/auth_controller")
 const authRouter=express.Router()
 
 authRouter.post("/googleauth",googleAuth)
-authRouter.post("/logout",logout)
+authRouter.get("/logout",logout)
 
 
 module.exports=authRouter
