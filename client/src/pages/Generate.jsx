@@ -1,9 +1,25 @@
 import { ArrowLeft } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
+import axios from "axios";
+import { serverUrl } from "../App";
 function Generate() {
   const navigate = useNavigate();
+  const [prompt,setPrompt]=useState("")
+  const handleGenerateWebsite=async ()=>{
+    try {
+      
+      const result=await axios.post(`${serverUrl}/api/website/generate`,{prompt},{
+        withCredentials:true
+      })
+      // alert(result.data.message)
+      console.log(result)
+      // navigate(`/editor/${result.data.websiteId}`)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div className="min-h-screen bg-linear-to-br from-[#050505] via-[#0b0b0b] to-[#050505] text-white">
       <div className="sticky top-0 z-40 backdrop-blur-xl bg-black/50 border-b border-white/10">
@@ -45,6 +61,8 @@ function Generate() {
           <h1 className="text-xl font-semibold mb-2"> Describe your website</h1>
           <div className="relative">
             <textarea
+            onChange={e=>setPrompt(e.target.value)}
+            value={prompt}
               name=""
               id=""
               placeholder="Describe your website in detail..."
@@ -54,6 +72,7 @@ function Generate() {
         </div>
         <div className="flex justify-center">
             <motion.div 
+            onClick={handleGenerateWebsite}
             whileHover={{scale:1.05}}
             whileTap={{scale:0.96}}
             className="px-14 py-4 rounded-2xl font-semibold text-lg bg-white text-black">
