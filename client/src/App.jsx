@@ -5,6 +5,7 @@ import useGetCurrentUSer from './hooks/useGetCurrentUSer'
 import { useSelector } from 'react-redux'
 import DashBoard from './pages/DashBoard'
 import Generate from './pages/Generate'
+import WebEditor from './pages/WebEditor'
 
 export const serverUrl="http://localhost:3000"
 function App() {
@@ -15,6 +16,7 @@ function App() {
     <Route path='/' element={<Home/>} />
     <Route path='/dashboard' element={userData?<DashBoard/>:<Home/>} />
     <Route path='/generate' element={userData?<Generate/>:<Home/>} />
+    <Route path='/editor/:websiteId' element={userData?<WebEditor/>:<Home/>} />
 
 
   </Routes>
