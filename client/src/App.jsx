@@ -9,7 +9,7 @@ import WebEditor from './pages/WebEditor'
 import Pricing from './pages/Pricing'
 import LiveSite from './components/LiveSite'
 
-export const serverUrl="http://localhost:3000"
+export const serverUrl="https://websitebuilder-316c.onrender.com"
 function App() {
   useGetCurrentUSer()
   const {userData}=useSelector(state=>state.user)
