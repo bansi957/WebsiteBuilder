@@ -39,7 +39,7 @@ const createCheckoutSession = async (req, res) => {
                 plan: selectedPlan.plan,
                 credits: String(selectedPlan.credits),
             },
-            success_url: `${frontendUrl}/pricing?success=1`,
+            success_url: `${frontendUrl}`,
             cancel_url: `${frontendUrl}/pricing?canceled=1`,
         });
 
