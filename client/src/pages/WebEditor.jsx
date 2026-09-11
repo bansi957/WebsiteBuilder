@@ -1,13 +1,14 @@
 import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { serverUrl } from '../App'
-import { Code2, MessageSquare, Monitor, Rocket, Send } from 'lucide-react'
+import { ArrowLeft, Code2, MessageSquare, Monitor, Rocket, Send } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 import { AnimatePresence,motion } from 'motion/react'
 import Editor from '@monaco-editor/react';
 import { X } from 'lucide-react'
 function WebEditor() {
+    const navigate=useNavigate()
     const {websiteId}=useParams()
     const [websiteData,setWebsiteData]=useState(null)
     const [error,setError]=useState(null)
@@ -27,6 +28,60 @@ function WebEditor() {
     const [showCode,setShowCode]=useState(false)
     const [thinkingIndex,setThinkingIndex]=useState(0)
     const [showMobileChat,setShowMobileChat]=useState(false)
+    const [deployLoading,setDeployLoading]=useState(false)
+    const [deployProgress,setDeployProgress]=useState(0)
+    const [deployStatusText,setDeployStatusText]=useState("Preparing deployment...")
+    const deployIntervalRef=useRef(null)
+    const deploySteps=[
+        "Analyzing website...",
+        "Creating your live URL...",
+        "Saving deployment details...",
+        "Finalizing launch...",
+    ]
+
+    useEffect(()=>{
+        return ()=>{
+            if(deployIntervalRef.current){
+                clearInterval(deployIntervalRef.current)
+            }
+        }
+    },[])
+
+    const stopDeployState=()=>{
+        if(deployIntervalRef.current){
+            clearInterval(deployIntervalRef.current)
+            deployIntervalRef.current=null
+        }
+        setDeployLoading(false)
+        setDeployProgress(0)
+        setDeployStatusText("Preparing deployment...")
+    }
+
+    const handleDeploy=async()=>{
+        setDeployLoading(true)
+        setDeployProgress(5)
+        setDeployStatusText(deploySteps[0])
+
+        let stepIndex=0
+        deployIntervalRef.current=setInterval(()=>{
+            stepIndex=(stepIndex+1)%deploySteps.length
+            setDeployProgress((current)=>Math.min(current+10,92))
+            setDeployStatusText(deploySteps[stepIndex])
+        },1600)
+
+        try {
+            const result=await axios.post(`${serverUrl}/api/website/deploy/${websiteId}` ,{},{withCredentials:true})
+            setDeployProgress(100)
+            setDeployStatusText("Deployment ready.")
+            setTimeout(()=>{
+                stopDeployState()
+                window.open(new URL(result.data.deployUrl).pathname, "_blank", "noopener,noreferrer")
+            },350)
+        } catch (error) {
+            console.log(error)
+            stopDeployState()
+        }
+    }
     useEffect(()=>{
        const fetchData=async ()=>{
            try {
@@ -129,14 +184,40 @@ function WebEditor() {
       </aside>
       <div className='flex-1 flex flex-col'>
         <div className='h-14 px-4 flex  justify-between items-center border-b border-white/10 bg-black/80'>  
-        <span className='text-xs text-zinc-400'>Live Preview</span>
+                <div className='flex items-center gap-3'>
+                    <button onClick={()=>navigate(-1)} className='p-2 rounded-lg hover:bg-white/10 transition'>
+                        <ArrowLeft size={16} />
+                    </button>
+                    <span className='text-xs text-zinc-400'>Live Preview</span>
+                </div>
        <div className='flex items-center gap-2'>
-         <button className='flex items-center gap-2 px-4 py-1.5 rounded-lg  bg-linear-to-r from-indigo-500 to-purple-500 text-sm font-semibold hover:scale-105 transition'><Rocket size={14} />Deploy</button>
+                 {!websiteData?.deployed ? (
+                 <button onClick={handleDeploy} disabled={deployLoading} className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition hover:scale-105 ${deployLoading ? "bg-gray-500 text-gray-200 cursor-not-allowed" : "bg-linear-to-r from-indigo-500 to-purple-500 text-white"}`}>
+                     <Rocket size={14} />{deployLoading ? "Deploying..." : "Deploy"}
+                 </button>
+                 ) : null}
          <button className="p-2 lg:hidden" onClick={()=>setShowMobileChat(!showMobileChat)}><MessageSquare size={18}/></button>
         <button className="p-2" onClick={()=>{setShowCode(!showCode)}}><Code2 size={18} /> </button>
         <button className="p-2" onClick={()=>setShowPreview(!showPreview)}><Monitor size={18}/></button>
        </div>
          </div>
+
+                 {deployLoading ? (
+                     <div className="px-4 py-3 border-b border-white/10 bg-black/70">
+                         <div className="mx-auto max-w-xl text-sm text-zinc-400">
+                             <div className="mb-2 flex items-center justify-between">
+                                 <span>{deployStatusText}</span>
+                                 <span className="font-medium text-white">{deployProgress}%</span>
+                             </div>
+                             <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                                 <div
+                                     className="h-full rounded-full bg-linear-to-r from-emerald-400 via-cyan-300 to-white transition-all duration-300"
+                                     style={{ width: `${deployProgress}%` }}
+                                 />
+                             </div>
+                         </div>
+                     </div>
+                 ) : null}
 
          <iframe className='flex-1 w-full bg-white' ref={iframeRef} />
 

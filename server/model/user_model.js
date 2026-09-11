@@ -23,6 +23,9 @@ const userSchema=new mongoose.Schema({
         type:String,
         enum:["free","pro","enterprise"],
         default:"free"
+    },
+    lastStripeSessionId:{
+        type:String
     }
     
 

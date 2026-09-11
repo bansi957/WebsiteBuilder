@@ -7,8 +7,9 @@ const app=express()
 const cors=require("cors")
 const userRouter = require("./routes/user_routes")
 const websiteRouter = require("./routes/website_routes")
+const billingRouter = require("./routes/billing_route")
+const { stripeWebhook } = require("./controller/billing_controller")
 const port=process.env.PORT ||5000
-app.use(express.json())
 app.use(cookieParser())
 
 app.use(cors({
@@ -16,9 +17,12 @@ app.use(cors({
     credentials:true
 }
 ))
+app.post("/api/billing/webhook", express.raw({ type: "application/json" }), stripeWebhook)
+app.use(express.json())
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/website",websiteRouter)
+app.use("/api/billing", billingRouter)
 
 app.listen(port,()=>{
     db()

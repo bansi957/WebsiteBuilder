@@ -13,6 +13,57 @@ function DashBoard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [copiedWebsiteId, setCopiedWebsiteId] = useState(null);
+
+  useEffect(() => {
+    if (!copiedWebsiteId) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCopiedWebsiteId(null);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [copiedWebsiteId]);
+
+  const handleDeployWebsite = async (websiteId, index) => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/website/deploy/${websiteId}`,
+        {},
+        { withCredentials: true }
+      );
+
+      const deployPath = new URL(result.data.deployUrl).pathname;
+
+      setWebsites((current) =>
+        current.map((website, currentIndex) =>
+          currentIndex === index
+            ? {
+                ...website,
+                deployed: true,
+                deployUrl: result.data.deployUrl,
+              }
+            : website
+        )
+      );
+
+      window.open(deployPath, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCopyDeployLink = async (deployUrl, websiteId) => {
+    try {
+      await navigator.clipboard.writeText(deployUrl);
+      setCopiedWebsiteId(websiteId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     const handleGetAllWebsites = async () => {
       setLoading(true);
@@ -42,7 +93,6 @@ function DashBoard() {
             >
               <ArrowLeft size={16} />
             </button>
-            <h1 className="text-lg font-semibold">Dashboard</h1>
           </div>
           <button
             onClick={() => navigate("/generate")}
@@ -70,13 +120,24 @@ function DashBoard() {
         )}
         {error && !loading && <p className="text-red-500">{error}</p>}
 
-        {websites?.length === 0 && !loading && (
-          <p className="text-zinc-400">
-            You have not created any websites yet.
-          </p>
+        {!loading && websites?.length === 0 && !error && (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-10 text-center">
+            <div className="mx-auto max-w-md">
+              <h2 className="text-2xl font-semibold">No websites yet</h2>
+              <p className="mt-3 text-sm text-zinc-400">
+                When you generate your first website, it will appear here in a card.
+              </p>
+              <button
+                onClick={() => navigate("/generate")}
+                className="mt-6 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:scale-105"
+              >
+                Generate Website
+              </button>
+            </div>
+          </div>
         )}
         {!loading && websites?.length > 0 && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap:8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
             {websites.map((item, index) => (
               <motion.div
                 key={index}
@@ -98,8 +159,23 @@ function DashBoard() {
                 <div className="p-5 flex flex-col gap-4 flex-1">
                   <h3 className="text-base font-semibold line-clamp-2">{item.title}</h3>
                   <p className="text-zinc-400 text-xs">Last Updated {item.updatedAt && new Date(item.updatedAt).toLocaleDateString()}</p>
-                  {!item?.deployed ?(<button className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-indigo-500 to-purple-500 hover:scale-105 transition"><Rocket size={18}/>Deploy</button>):(
-                  <button className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-green-500 to-emerald-500 hover:scale-105 transition"><Share2 size={18}/> Share Link</button>)}
+                  {!item?.deployed ?(
+                  <button
+                    onClick={() => handleDeployWebsite(item._id, index)}
+                    className="mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-indigo-500 to-purple-500 hover:scale-105 transition"
+                  >
+                    <Rocket size={18}/>Deploy
+                  </button>):(
+                  <button
+                    onClick={() => item.deployUrl && handleCopyDeployLink(item.deployUrl, item._id)}
+                    className={`mt-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition hover:scale-105 ${
+                      copiedWebsiteId === item._id
+                        ? "bg-linear-to-r from-emerald-500 to-green-500 text-white"
+                        : "bg-linear-to-r from-green-500 to-emerald-500"
+                    }`}
+                  >
+                    <Share2 size={18}/>{copiedWebsiteId === item._id ? "Copied" : "Share Link"}
+                  </button>)}
                 </div>
               </motion.div>
             ))}

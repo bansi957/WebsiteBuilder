@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux'
 import DashBoard from './pages/DashBoard'
 import Generate from './pages/Generate'
 import WebEditor from './pages/WebEditor'
+import Pricing from './pages/Pricing'
+import LiveSite from './components/LiveSite'
 
 export const serverUrl="http://localhost:3000"
 function App() {
@@ -17,6 +19,8 @@ function App() {
     <Route path='/dashboard' element={userData?<DashBoard/>:<Home/>} />
     <Route path='/generate' element={userData?<Generate/>:<Home/>} />
     <Route path='/editor/:websiteId' element={userData?<WebEditor/>:<Home/>} />
+    <Route path='/live-site/:websiteKey' element={<LiveSite/>} />
+    <Route path='/pricing' element={<Pricing/>} />
 
 
   </Routes>

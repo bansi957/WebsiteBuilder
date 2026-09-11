@@ -200,7 +200,7 @@ const generateWebsite=async (req,res)=>{
             user: user._id,
             title: prompt.slice(0,50),
             latestCode: parsed.code,
-            conversation: [{role:"ai",content:parsed.message}, {role:"user",content:prompt}],
+            conversation: [{role:"user",content:prompt},{role:"ai",content:parsed.message}],
             slug: prompt.slice(0,50).toLowerCase().replace(/[^a-z0-9]+/g, '-')
         })
         user.credits-=50
@@ -292,5 +292,31 @@ const getAllWebsites=async (req,res)=>{
     }
   }
 
+const deployWebsite=async (req,res)=>{
+  try {
+    const {websiteId}=req.params
+    const website=await Website.findOne({_id:websiteId,user:req.user._id})
+    if(!website){
+      return res.status(404).json({error:"Website not found"})
+    }
+
+    const baseUrl=process.env.CLIENT_URL || "http://localhost:5173"
+    const deployKey=`${website.slug || website.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${website._id}`
+    const deployUrl=`${baseUrl}/live-site/${deployKey}`
+
+    website.deployed=true
+    website.deployUrl=deployUrl
+    await website.save()
+
+    return res.status(200).json({
+      message:"Website deployed successfully",
+      deployUrl,
+      website,
+    })
+  } catch (error) {
+    return res.status(500).json({error:"Website deploy error"})
+  }
+}
+
   
-module.exports={generateWebsite,getWebsiteById,changes,getAllWebsites}
+module.exports={generateWebsite,getWebsiteById,changes,getAllWebsites,deployWebsite}
