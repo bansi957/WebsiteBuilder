@@ -13,7 +13,7 @@ const port=process.env.PORT ||5000
 app.use(cookieParser())
 
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:"https://websitebuilder-1-qi76.onrender.com",
     credentials:true
 }
 ))
