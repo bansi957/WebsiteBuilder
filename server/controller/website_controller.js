@@ -318,5 +318,30 @@ const deployWebsite=async (req,res)=>{
   }
 }
 
+const getPublicWebsite = async (req, res) => {
+  try {
+    const { websiteId } = req.params;
+
+    const website = await Website.findById(websiteId);
+
+    if (!website) {
+      return res.status(404).json({
+        message: "Website not found"
+      });
+    }
+
+    return res.status(200).json({
+      title: website.title,
+      latestCode: website.latestCode
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "Failed to load public website"
+    });
+  }
+};
   
-module.exports={generateWebsite,getWebsiteById,changes,getAllWebsites,deployWebsite}
+module.exports={generateWebsite,getWebsiteById,changes,getAllWebsites,deployWebsite,getPublicWebsite}
