@@ -284,7 +284,7 @@ const changes=async(req,res)=>{
 
 const getAllWebsites=async (req,res)=>{
     try{
-      const websites=await Website.find({user:req.user._id})
+      const websites=await Website.find({user:req.user._id}).sort({ createdAt: -1 });
       return res.status(200).json(websites)
     }
     catch(error){
