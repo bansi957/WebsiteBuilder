@@ -7,7 +7,7 @@ const websiteRouter=express.Router()
 
 
 websiteRouter.post("/generate",auth_middleware,generateWebsite)
-websiteRouter.get("/get-by-id/:websiteId",getWebsiteById)
+websiteRouter.get("/get-by-id/:websiteId",auth_middleware,getWebsiteById)
 websiteRouter.post("/update/:websiteId",auth_middleware,changes)
 websiteRouter.get("/get-all",auth_middleware,getAllWebsites)
 websiteRouter.post("/deploy/:websiteId",auth_middleware,deployWebsite)
