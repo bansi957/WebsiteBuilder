@@ -1,6 +1,6 @@
 const express=require("express")
 const auth_middleware = require("../middleware/auth_middleware")
-const {generateWebsite,getWebsiteById,getAllWebsites,changes,deployWebsite} = require("../controller/website_controller")
+const {generateWebsite,getWebsiteById,getAllWebsites,changes,deployWebsite,getPublicWebsite} = require("../controller/website_controller")
 
 
 const websiteRouter=express.Router()
@@ -11,4 +11,5 @@ websiteRouter.get("/get-by-id/:websiteId",auth_middleware,getWebsiteById)
 websiteRouter.post("/update/:websiteId",auth_middleware,changes)
 websiteRouter.get("/get-all",auth_middleware,getAllWebsites)
 websiteRouter.post("/deploy/:websiteId",auth_middleware,deployWebsite)
+websiteRouter.get("/public/:websiteId", getPublicWebsite);
 module.exports=websiteRouter
