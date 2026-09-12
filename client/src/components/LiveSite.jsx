@@ -19,7 +19,7 @@ function LiveSite() {
 
       try {
         const result = await axios.get(
-          `${serverUrl}/api/website/get-by-id/${websiteId}`,
+          `${serverUrl}/api/website/public/${websiteId}`,
           {
             withCredentials: true,
           }
