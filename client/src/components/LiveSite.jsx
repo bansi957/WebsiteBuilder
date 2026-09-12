@@ -24,7 +24,7 @@ function LiveSite() {
             withCredentials: true,
           }
         );
-        setWebsite(result.data.website);
+        setWebsite(result.data);
       } catch (error) {
         setError(error.response?.data || { message: "Failed to load website" });
       }
