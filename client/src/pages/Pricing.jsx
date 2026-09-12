@@ -98,13 +98,13 @@ function Pricing() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(103,58,183,0.35),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.2),transparent_30%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent_30%)]" />
 
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full px-3 py-2 text-sm text-zinc-300 transition hover:bg-white/5 hover:text-white"
-      >
-        <ArrowLeft size={16} />
-        Back
-      </button>
+     <button
+  onClick={() => navigate(-1)}
+  className="fixed left-4 top-4 z-[100] flex items-center gap-2 rounded-full px-3 py-2 text-sm text-zinc-300 transition hover:bg-white/5 hover:text-white"
+>
+  <ArrowLeft size={16} />
+  Back
+</button>
 
       <main className="relative z-10 mx-auto max-w-7xl px-6 pb-16 pt-16 md:pt-20">
         <motion.div
